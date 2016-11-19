@@ -159,7 +159,3 @@ if __name__=='__main__':
 
     #for test
     print(distance_matrix)
-    print(freq_array)
-    print(C)
-    print(C_SHARP)
-    print(D)
