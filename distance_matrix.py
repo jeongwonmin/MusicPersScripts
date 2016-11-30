@@ -17,6 +17,9 @@ A =	440
 A_SHARP = 466.16
 B = 493.88
 
+#chord class flag
+chord_class_flag = 1
+
 def alph_to_freq(alph):
     if alph == 'c':
         return C
@@ -47,34 +50,48 @@ def alph_to_freq(alph):
 def distance1(a, b):
     return min(abs(math.log2(a)-math.log2(b)), 1 - abs(math.log2(a)-math.log2(b)))
 
-#distance between (a1, a2) and (b1, b2)
+
 def distance2(a1, a2, b1, b2):
-    return min(distance1(a1,b1)+distance1(a2,b2),
-               distance1(a1,b2)+distance1(a2,b1))
+    #chord class distance between (a1, a2) and (b1, b2)
+    if chord_class_flag == 0:
+        return min(distance1(a1,b1)+distance1(a2,b2), distance1(a1,b2)+distance1(a2,b1))
+
+    #pitch class distance between (a1, a2) and (b1, b2)
+    else :
+        return distance1(a1,b1)+distance1(a2,b2)
+
 
 def distance3(a1, a2, a3, b1, b2, b3):
-    dist123 = distance1(a1,b1) + distance1(a2,b2) + distance1(a3,b3)
-    
-    dist132 = distance1(a1,b1) + distance1(a2,b3) + distance1(a3,b2)
+    #chord class distance between (a1, a2, a3) and (b1, b2, b3)
+    if chord_class_flag == 0:
+        dist123 = distance1(a1,b1) + distance1(a2,b2) + distance1(a3,b3)
 
-    dist213 = distance1(a1,b2) + distance1(a2,b1) + distance1(a3,b3)
+        dist132 = distance1(a1,b1) + distance1(a2,b3) + distance1(a3,b2)
+
+        dist213 = distance1(a1,b2) + distance1(a2,b1) + distance1(a3,b3)
+
+        dist231 = distance1(a1,b2) + distance1(a2,b3) + distance1(a3,b1)
+
+        dist312 = distance1(a1,b3) + distance1(a2,b1) + distance1(a3,b2)
+
+        dist321 = distance1(a1,b3) + distance1(a2,b2) + distance1(a3,b1)
     
-    dist231 = distance1(a1,b2) + distance1(a2,b3) + distance1(a3,b1)
-    
-    dist312 = distance1(a1,b3) + distance1(a2,b1) + distance1(a3,b2)
-    
-    dist321 = distance1(a1,b3) + distance1(a2,b2) + distance1(a3,b1)
-    
-    return min(dist123, dist132, dist213, dist231, dist312, dist321)
+        return min(dist123, dist132, dist213, dist231, dist312, dist321)
+
+    #pitch class distance between (a1, a2, a3) and (b1, b2, b3)
+    else:
+        return distance1(a1,b1) + distance1(a2,b2) + distance1(a3,b3)
 
 if __name__=='__main__':
     
     parser = argparse.ArgumentParser(description='write frequency sequence csv file')
     parser.add_argument('--dim', metavar='d', type=int, help='create d-tuple')
+    parser.add_argument('--cc', nargs='?', metavar = 'cc', type=int, default=1, help='chord class distance on: input "--cc 0"')
     parser.add_argument('infile', nargs='?', metavar='infile', default='./test.csv', help='input file path')
     parser.add_argument('outfile', nargs='?', metavar='outfile', default='./out_dist.csv', help='output file path')
     args = parser.parse_args()
-
+    
+    chord_class_flag = args.cc
 
     if args.dim == 1:
         
@@ -109,9 +126,12 @@ if __name__=='__main__':
             
             for row in reader:
                 freq_row.append(alph_to_freq(row[0]))
+                print(alph_to_freq(row[0]))
 
         freq_array.append(freq_row[:len(freq_row)-1])
         freq_array.append(freq_row[1:])
+        
+        print(freq_array)
 
         distance_matrix = []
         distance_row = []
@@ -125,6 +145,7 @@ if __name__=='__main__':
         with open(args.outfile, 'w') as writef:
             writer = csv.writer(writef, lineterminator='\n')
             writer.writerows(distance_matrix)
+        print(distance_matrix)
 
 
     if args.dim == 3:
@@ -156,6 +177,3 @@ if __name__=='__main__':
             writer = csv.writer(writef, lineterminator='\n')
             writer.writerows(distance_matrix)
 
-
-    #for test
-    print(distance_matrix)
