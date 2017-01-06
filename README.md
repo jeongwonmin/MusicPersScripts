@@ -1,8 +1,8 @@
-# A script for calculation of music persistent homology
-This is a script to create distance matrix csv of a "score" (as a csv file).
+# Scripts and CSV scores for calculation of music persistent homology
+This repository includes scripts and csv scores to create distance matrices.
 
-## Make a score csv
-Input key signature names. Left is our input.
+## Make a score csv file
+Insert key signature names in the first column. I prepared some examples.
 
 - 'c'= C
 - 'cs' = C#
